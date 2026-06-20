@@ -1,31 +1,37 @@
-import { Outlet, Navigate } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import Sidebar from './Sidebar';
-import Topbar from './Topbar';
-import { useLocation } from 'react-router-dom';
+import Topbar  from './Topbar';
+import { useAuth } from '../context/AuthContext';
 
-const PAGE_TITLES = {
-  '/dashboard':      { title: 'Dashboard',         subtitle: 'Overview of your business' },
-  '/products':       { title: 'Products',           subtitle: 'Manage your product catalog & BoM' },
-  '/purchase':       { title: 'Purchase Orders',    subtitle: 'Manage vendor purchases & stock intake' },
-  '/manufacturing':  { title: 'Manufacturing',      subtitle: 'Manage production orders' },
-  '/sales':          { title: 'Sales Orders',       subtitle: 'Manage customer orders & deliveries' },
-  '/inventory':      { title: 'Inventory',          subtitle: 'Real-time stock levels & movements' },
-  '/reports':        { title: 'Reports',            subtitle: 'Business analytics & insights' },
+const PAGE_META = {
+  '/dashboard':      { title: 'Dashboard',          subtitle: 'Business overview at a glance' },
+  '/products':       { title: 'Products',            subtitle: 'Manage your product catalog & BoMs' },
+  '/sales':          { title: 'Sales Orders',        subtitle: 'Manage customer orders & deliveries' },
+  '/purchase':       { title: 'Purchase Orders',     subtitle: 'Manage vendor orders & receiving' },
+  '/manufacturing':  { title: 'Manufacturing',       subtitle: 'Production orders & work center tracking' },
+  '/inventory':      { title: 'Inventory',           subtitle: 'Real-time stock levels & ledger' },
+  '/reports':        { title: 'Reports & Analytics', subtitle: 'Business insights & KPIs' },
+  '/users':          { title: 'User Management',     subtitle: 'Manage users, roles & access rights' },
 };
 
 export default function Layout() {
-  const token = localStorage.getItem('erp_token');
-  const location = useLocation();
+  const { isAuthenticated, loading } = useAuth();
+  const navigate = useNavigate();
+  const path = window.location.pathname;
+  const meta = PAGE_META[path] || { title: 'ERP System', subtitle: '' };
 
-  if (!token) return <Navigate to="/login" replace />;
+  useEffect(() => {
+    if (!loading && !isAuthenticated) navigate('/login', { replace: true });
+  }, [isAuthenticated, loading]);
 
-  const pageInfo = PAGE_TITLES[location.pathname] || { title: 'ERP', subtitle: '' };
+  if (loading) return <div className="loading-center"><div className="spinner" /></div>;
 
   return (
     <div className="app-layout">
       <Sidebar />
       <div className="main-content">
-        <Topbar title={pageInfo.title} subtitle={pageInfo.subtitle} />
+        <Topbar title={meta.title} subtitle={meta.subtitle} />
         <main className="page-content">
           <Outlet />
         </main>

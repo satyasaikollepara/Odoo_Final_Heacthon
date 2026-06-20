@@ -24,12 +24,15 @@ CREATE TYPE order_status AS ENUM (
 -- ───────────────────────────────────────────
 
 CREATE TABLE users (
-  id         SERIAL PRIMARY KEY,
-  name       VARCHAR(100)  NOT NULL,
-  email      VARCHAR(150)  NOT NULL UNIQUE,
-  password   VARCHAR(255)  NOT NULL,
-  role       user_role     NOT NULL DEFAULT 'SALES',
-  created_at TIMESTAMP     NOT NULL DEFAULT NOW()
+  id          SERIAL PRIMARY KEY,
+  employee_id VARCHAR(50)   UNIQUE,
+  name        VARCHAR(100)  NOT NULL,
+  email       VARCHAR(150)  NOT NULL UNIQUE,
+  phone       VARCHAR(20),
+  password    VARCHAR(255)  NOT NULL,
+  role        user_role     NOT NULL DEFAULT 'SALES',
+  status      VARCHAR(20)   NOT NULL DEFAULT 'ACTIVE',
+  created_at  TIMESTAMP     NOT NULL DEFAULT NOW()
 );
 
 -- ───────────────────────────────────────────

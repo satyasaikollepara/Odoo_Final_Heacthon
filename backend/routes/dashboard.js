@@ -99,12 +99,34 @@ router.get('/', async (req, res) => {
       `)
     ]);
 
+    // Users count
+    const userCount = await pool.query('SELECT COUNT(*) as total FROM users');
+    // Revenue from delivered sales
+    const revenueRes = await pool.query(`
+      SELECT COALESCE(SUM(soi.quantity * p.sales_price), 0) as revenue
+      FROM sales_orders so
+      JOIN sales_order_items soi ON soi.sales_order_id = so.id
+      JOIN products p ON p.id = soi.product_id
+      WHERE so.status = 'DELIVERED'
+    `).catch(() => ({ rows: [{ revenue: 0 }] }));
+
+    // Product health counts
+    const healthRes = await pool.query(`
+      SELECT
+        COUNT(*) FILTER (WHERE on_hand_qty = 0) as out_of_stock,
+        COUNT(*) FILTER (WHERE on_hand_qty > 10) as healthy
+      FROM products
+    `);
+
     res.json({
       products: {
         total: parseInt(productCount.rows[0].total),
+        out_of_stock: parseInt(healthRes.rows[0]?.out_of_stock || 0),
+        healthy: parseInt(healthRes.rows[0]?.healthy || 0),
         ...stockSummary.rows[0]
       },
-      sales: salesSummary.rows[0],
+      users: { total: parseInt(userCount.rows[0].total) },
+      sales: { ...salesSummary.rows[0], revenue: revenueRes.rows[0]?.revenue || 0 },
       purchase: purchaseSummary.rows[0],
       manufacturing: mfgSummary.rows[0],
       recent_sales: recentSales.rows,

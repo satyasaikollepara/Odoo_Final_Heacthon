@@ -1,22 +1,19 @@
-const STATUS_MAP = {
-  DRAFT:       'draft',
-  CONFIRMED:   'confirmed',
-  IN_PROGRESS: 'in_progress',
-  DELIVERED:   'delivered',
-  RECEIVED:    'received',
-  COMPLETED:   'completed',
-  CANCELLED:   'cancelled',
-  PURCHASE:    'purchase',
-  MANUFACTURING: 'manufacturing',
-  MTS: 'confirmed',
-  MTO: 'warning',
+const MAP = {
+  DRAFT:       'badge-draft',
+  CONFIRMED:   'badge-confirmed',
+  IN_PROGRESS: 'badge-in_progress',
+  DELIVERED:   'badge-delivered',
+  RECEIVED:    'badge-received',
+  COMPLETED:   'badge-completed',
+  CANCELLED:   'badge-cancelled',
+  PURCHASE:    'badge-purchase',
+  MANUFACTURING: 'badge-manufacturing',
+  ACTIVE:      'badge-confirmed',
+  INACTIVE:    'badge-cancelled',
 };
 
 export default function Badge({ status }) {
-  const key = STATUS_MAP[status] || 'draft';
   return (
-    <span className={`badge badge-${key}`}>
-      {status?.replace('_', ' ')}
-    </span>
+    <span className={`badge ${MAP[status] || 'badge-draft'}`}>{status}</span>
   );
 }
